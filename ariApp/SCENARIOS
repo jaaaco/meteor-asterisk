@@ -1,0 +1,79 @@
+1. Dial from kaypad
+ - create Room from new Channel
+ - create destination Channel in that Room (ring tones from dialout)
+ - no answer -- kill it
+ - answered - go to 3.
+
+2. Dial from app
+ - create Room
+ - create source channel, wait for answer
+  - no answer -- kill it
+  - answered -- create destination Channel, go to 3
+
+3. Talking, possible actions:
+ - hangup room
+ - mute room
+ - moh room
+ - playback room
+ - leave room
+ - join rooms
+ - split rooms
+ - record room
+ - queue above action
+ - launch immediately an action
+ - queue action after timeout
+
+
+ var ring = Room.playback('welcome').ring(dst);
+ ring.on('timeout').voicemail();
+ ring.on('answer').
+
+
+// calling from outside
+room.queueAction('playback','welcome');
+room.queueAction('ring',[no1,no2,no3],{
+    onAnswer: function() {
+        this.setStatus('talking');
+        this.record();
+    },
+    onTimeout: function() {
+        this.action('voicemail');
+    }
+});
+
+room.done = function() {
+    if (this.hasNextAction()) {
+        this.callNextAction();
+    } else {
+        this.noop();
+    }
+}
+
+room.actions({
+    noop: function() {},
+    ring: function(numbers) {
+        this.join(n1);
+        this.join(n2);
+    },
+    playback: function(file) {
+        this.done();
+    },
+    voicemail: function() {
+        this.queueAction('playback','voicemail');
+        this.beep();
+        this.record();
+    }
+});
+
+
+3b. Talking - join conversation (same as taking over a ring)
+ - dialing to room
+ - dialing from app
+
+4. IVR (from 3.)
+ - authorized channel runs IVR
+
+ROOMS = MESSAGES
+
+
+
