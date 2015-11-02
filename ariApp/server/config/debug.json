@@ -1,0 +1,8 @@
+{
+  "ari": {
+    "host": "192.168.1.28",
+    "port": "8088",
+    "username": "username",
+    "password": "password"
+  }
+}
