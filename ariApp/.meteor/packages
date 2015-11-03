@@ -11,7 +11,8 @@ es5-shim                # ECMAScript 5 compatibility for older browsers.
 ecmascript              # Enable ECMAScript2015+ syntax in app code
 meteorhacks:npm
 accounts-password
-
-npm-container
 ejson
 jeeeyul:moment-with-langs@2.6.0
+
+
+npm-container

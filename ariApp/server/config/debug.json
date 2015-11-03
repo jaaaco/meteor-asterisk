@@ -1,8 +1,12 @@
 {
   "ari": {
-    "host": "192.168.1.28",
+    "host": "192.168.99.100",
     "port": "8088",
     "username": "username",
     "password": "password"
+  },
+  "debug" : {
+    "ariClient": true,
+    "ariRest": true
   }
 }

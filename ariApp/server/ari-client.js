@@ -22,8 +22,10 @@ function startWS() {
         + Meteor.settings.ari.username
         + ':' + Meteor.settings.ari.password+'&app=hello-world');
 
+
     ws.on('error', function(err){
         Fiber(function (err) {
+            console.log(err,ws);
             Status.update({type: 'ariClient'},{$set: {status: 'error', lastError: err}});
         }).run(err);
     });
@@ -42,29 +44,33 @@ function startWS() {
     });
 
     ws.on('message', function(data, flags) {
-        var data = {};
+        var receivedData;
         try {
-            data = EJSON.parse(data);
+            receivedData = EJSON.parse(data);
+
+            ariDebug('Message received'.red, receivedData.type.grey);
+
+            switch (receivedData.type) {
+                case 'ChannelDtmfReceived':
+                case 'PlaybackFinished':
+                case 'StasisStart':
+                case 'StasisEnd':
+                case 'ChannelDestroyed':
+                case 'ChannelEnteredBridge':
+                case 'ChannelHangupRequest':
+
+                    Fiber(function (receivedData) {
+                        AriMessages.insert(receivedData);
+                    }).run(receivedData);
+
+                    break;
+            }
+
         } catch (e) {
-            ariDebug('JSON Parse failed');
+            ariDebug('JSON Parse failed',data);
         }
 
-        ariDebug('Message received'.red, data.type.grey);
 
-        switch (data.type) {
-            case 'ChannelDtmfReceived':
-            case 'PlaybackFinished':
-            case 'StasisStart':
-            case 'StasisEnd':
-            case 'ChannelDestroyed':
-            case 'ChannelEnteredBridge':
-
-                Fiber(function (data) {
-                    AriMessages.insert(data);
-                }).run(data);
-
-                break;
-        }
 
 
     });
