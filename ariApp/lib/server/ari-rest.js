@@ -3,6 +3,7 @@ var rest = Meteor.npmRequire('restler');
 
 function ariDebug() {
     if (Meteor.settings.debug.ariRest) {
+        console.log('ariDebug:');
         console.log.apply(this,arguments);
     }
 }

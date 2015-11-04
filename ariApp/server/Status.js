@@ -8,6 +8,7 @@ var colors =  Meteor.npmRequire('colors');
 
 Meteor.startup(function(){
     Status.remove({});
+    AriMessages.remove({});
 
 
     Status.find({status: 'down'}).observe({

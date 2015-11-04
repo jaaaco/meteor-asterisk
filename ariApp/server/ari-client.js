@@ -48,7 +48,7 @@ function startWS() {
         try {
             receivedData = EJSON.parse(data);
 
-            ariDebug('Message received'.red, receivedData.type.grey);
+
 
             switch (receivedData.type) {
                 case 'ChannelDtmfReceived':
@@ -58,6 +58,7 @@ function startWS() {
                 case 'ChannelDestroyed':
                 case 'ChannelEnteredBridge':
                 case 'ChannelHangupRequest':
+                case 'ChannelStateChange':
 
                     Fiber(function (receivedData) {
                         AriMessages.insert(receivedData);
@@ -69,9 +70,5 @@ function startWS() {
         } catch (e) {
             ariDebug('JSON Parse failed',data);
         }
-
-
-
-
     });
 }
