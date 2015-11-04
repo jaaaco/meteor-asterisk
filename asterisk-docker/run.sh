@@ -1,0 +1,1 @@
+docker run -ti --net=host asterisk

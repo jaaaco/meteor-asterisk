@@ -75,5 +75,31 @@ room.actions({
 
 ROOMS = MESSAGES
 
+====
 
+1. Internal call to one person
+- dial / channel created
+- dialout to destination on new channel
+ - busy (voicemail)
+ - not answering (timeout voicemail)
+ - answers, continue
+- create bridge, join channels
+- start normal operation
+
+2. external call to group
+- incoming channel created
+- play welcome, then ring signal
+- originate outgoing channels
+- if one answers, kill rest
+- if no one answers go to voicemail
+
+X0. Normal operation
+- listen do DTMF
+- react to hangups
+- process transfers
+
+X1. Attended transfer
+- remove talker from room
+- play ring tone
+- go with scenario 1
 

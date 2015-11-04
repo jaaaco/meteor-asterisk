@@ -7,6 +7,30 @@ function ariDebug() {
 class Channel {
     constructor(id) {
         this.id = id;
+
+        var types = [
+            'ChannelDtmfReceived',
+            'ChannelDestroyed',
+            'ChannelEnteredBridge',
+            'ChannelHangupRequest',
+            'ChannelStateChange'
+        ];
+
+        this.observer = AriMessages.find({id: this.id, type: {$in: types}}).observe({
+            added: (m) => {
+                switch (m.type) {
+                    case 'ChannelStateChange':
+                        this.onAnswer.call(this);
+                        break;
+                    case 'ChannelDestroyed':
+                        this.onHangup.call(this);
+                        break;
+                    case 'ChannelDtmfReceived':
+                        this.onDtmf(this); // TODO: pass digit
+                        break;
+                }
+            }
+        });
     }
 
     ring(timeSeconds) {
@@ -44,6 +68,55 @@ class Room {
 
         var channel = new Channel(channelId);
 
+        channel.onHangup = () => {
+
+        };
+
+        channel.onAnswer = () => {
+
+        };
+
+        channel.ring(4).then(() => channel.answer());
+
+
+
+        var destinationChannel1 = new Channel();
+        var destinationChannel2 = new Channel();
+        var destinationChannel3 = new Channel();
+
+        var c1p = destinationChannel1.originate('301');
+        var c2p = destinationChannel2.originate('302');
+        var c3p = destinationChannel3.originate('303');
+
+        Promise.race([c1p,c2p,c3p]).then(
+            (c) => {
+                // close other channels
+                this.addChannel(c);
+
+            }
+        );
+
+
+    //.then(
+    //        // success
+    //        () => {
+    //            this.addChannel(channel);
+    //            this.addChannel(destinationChannel);
+    //            this.startNormalOperation();
+    //        },
+    //
+    //        // fail
+    //        () => {
+    //            channel.busy();
+    //            channel.wait(3);
+    //            channel.hangup();
+    //        }
+    //    );
+
+
+
+
+
         channel.ring(4).then(() => channel.answer()).then(() => channel.wait(3)).then(() => channel.hangup());
 
         //ARI.post('bridges',{type: 'mixing,proxy_media'}, (bridge) => {
@@ -55,6 +128,10 @@ class Room {
         //    ARI.post('channels/' + channel.id + '/answer');
         //    ARI.post('channels/' + channel.id + '/moh');
         //});
+    }
+
+    startNormalOperation() {
+
     }
 
     addChannel(channel) {
@@ -88,6 +165,9 @@ AriMessages.find().observe({
                         ariDebug('to number'.green, m.channel.dialplan.exten.green, m.channel.id.grey);
 
                         ariDebug(m.channel);
+
+                        Channels.insert(_.extend(_.pick(m.channel,'id'),{intent: 'internalConnection'}));
+
 
                         var room = new Room(m.channel.id);
                     }
