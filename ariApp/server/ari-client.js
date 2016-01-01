@@ -1,74 +1,133 @@
-var client = Meteor.npmRequire('ari-client');
-Fiber = Meteor.npmRequire("fibers");
-var colors =  Meteor.npmRequire('colors');
+let client = Meteor.npmRequire('ari-client');
 
-Status.find({type: 'ariClient', status: 'restart'}).observe({
-    added: function(status) {
-        startWS();
-    }
-});
-
-function ariDebug() {
-    if (Meteor.settings.debug.ariClient) {
-        console.log.apply(this,arguments);
-    }
+function waitFor(seconds) {
+    return new Promise((resolve) => {
+        console.log('wait started');
+        setTimeout((resolve)=>{
+            console.log('wait stopped');
+            resolve();
+        },seconds * 1000, resolve);
+    });
 }
 
-function startWS() {
-    var WebSocket = Meteor.npmRequire('ws');
-    var ws = new WebSocket(
-        'ws://' + Meteor.settings.ari.host + ':'
-        + Meteor.settings.ari.port + '/ari/events?api_key='
-        + Meteor.settings.ari.username
-        + ':' + Meteor.settings.ari.password+'&app=hello-world');
-
-
-    ws.on('error', function(err){
-        Fiber(function (err) {
-            console.log(err,ws);
-            Status.update({type: 'ariClient'},{$set: {status: 'error', lastError: err}});
-        }).run(err);
+function ringFor(channel, seconds) {
+    return new Promise((resolve) => {
+        channel.ring().then(()=>{
+            waitFor(seconds).then(()=>{
+                channel.ringStop().then(()=>{
+                    resolve();
+                });
+            });
+        });
     });
 
-    ws.on('close', function (e) { // something went wrong
-        Fiber(function () {
-            Status.update({type: 'ariClient'},{$set: {status: 'down'}});
-        }).run();
-    });
+}
 
-    ws.on('open', function() {
-        ariDebug('WS Connected'.green);
-        Fiber(function () {
-            Status.update({type: 'ariClient'},{$unset: {lastError: ''}, $set: {status: 'up'}});
-        }).run();
-    });
+client.connect('http://' + Meteor.settings.ari.host + ':'
+    + Meteor.settings.ari.port, Meteor.settings.ari.username, Meteor.settings.ari.password)
+    .then(function (ari) {
+        // use once to start the application
 
-    ws.on('message', function(data, flags) {
-        var receivedData;
-        try {
-            receivedData = EJSON.parse(data);
+        var mixingBridge  = ari.Bridge();
+        mixingBridge.create({type: 'mixing'});
+
+        ari.on('StasisStart',
+            function (event, incoming) {
 
 
 
-            switch (receivedData.type) {
-                case 'ChannelDtmfReceived':
-                case 'PlaybackFinished':
-                case 'StasisStart':
-                case 'StasisEnd':
-                case 'ChannelDestroyed':
-                case 'ChannelEnteredBridge':
-                case 'ChannelHangupRequest':
-                case 'ChannelStateChange':
+                if (incoming.dialplan.exten != 'h' && incoming.dialplan.context === 'from-internal' && incoming.state == 'Ring') {
+                    console.log('new incoming channel', incoming.dialplan, incoming.id, incoming.state);
 
-                    Fiber(function (receivedData) {
-                        AriMessages.insert(receivedData);
-                    }).run(receivedData);
+                    incoming.answer()
+                        .then(function () {
+                            incoming.on('StasisEnd', function(event, channel){
+                                if (channel.dialplan.exten != 'h') {
+                                    console.log('StasisEnd', channel.dialplan, channel.id);
+                                }
+                            });
 
-                    break;
-            }
+                            ringFor(incoming, 2).then(()=>{
+                                mixingBridge.addChannel({channel: incoming.id});
+                            });
 
-        } catch (e) {
-            ariDebug('JSON Parse failed',data);
+
+                            console.log('channel answered');
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR answer', err);
+                        });
+                } else {
+                    console.log('other channel',incoming.dialplan, incoming.id, incoming.state);
+                }
+            });
+
+
+        function getOrCreateBridge (channel) {
+            return ari.bridges.list()
+                .then(function (bridges) {
+                    var bridge = bridges.filter(function (candidate) {
+                        return candidate['bridge_type'] === 'holding';
+                    })[0];
+
+                    if (!bridge) {
+                        bridge = ari.Bridge();
+
+                        return bridge.create({type: 'holding'});
+                    } else {
+                        // Add incoming channel to existing holding bridge and play
+                        // music on hold
+                        return bridge;
+                    }
+                });
         }
-    });
-}
+
+        /**
+         *  Join holding bridge and play music on hold. An event listener is also
+         *  setup to handle cleaning up the bridge once all channels have left it.
+         *
+         *  @function joinHoldingBridgeAndPlayMoh
+         *  @memberof bridge-example
+         *  @param {module:resources~Bridge} bridge -
+         *    the holding bridge to add the channel to
+         *  @param {module:resources~Channel} channel -
+         *    the channel that entered Stasis
+         *  @returns {Q} promise - a promise that will resolve once the channel
+         *                         has been added to the bridge and moh has been
+         *                         started
+         */
+        function joinHoldingBridgeAndPlayMoh (bridge, channel) {
+            bridge.on('ChannelLeftBridge',
+                /**
+                 *  If no channel remains in the bridge, destroy it.
+                 *
+                 *  @callback channelLeftBridgeCallback
+                 *  @memberof bridge-example
+                 *  @param {Object} event - the full event object
+                 *  @param {Object} instances - bridge and channel
+                 *    instances tied to this channel left bridge event
+                 */
+                function (event, instances) {
+
+                    var holdingBridge = instances.bridge;
+                    if (holdingBridge.channels.length === 0 &&
+                        holdingBridge.id === bridge.id) {
+
+                        bridge.destroy()
+                            .catch(function (err) {});
+                    }
+                });
+
+            return bridge.addChannel({channel: channel.id})
+                .then(function () {
+                    return channel.startMoh();
+                });
+        }
+
+        // can also use ari.start(['app-name'...]) to start multiple applications
+        ari.start('hello-world');
+    })
+    .catch(function (err) {
+        console.log('connect error', err);
+    })
+    .done();
