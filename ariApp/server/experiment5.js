@@ -56,21 +56,9 @@ client.connect('http://' + Meteor.settings.ari.host + ':'
                                     exten: channel.dialplan.exten
                                 });
 
-                                Actions.insert({
-                                    Channels: {_id: channelId, id: channel.id},
-                                    type: 'ring'
-                                });
-
-                                Actions.insert({
-                                    Channels: {_id: channelId, id: channel.id},
-                                    type: 'wait',
-                                    time: 2
-                                });
-
-                                Actions.insert({
-                                    Channels: {_id: channelId, id: channel.id},
-                                    type: 'moh'
-                                });
+                                Actions.channelAdd(channel.id,'ring');
+                                Actions.channelAdd(channel.id,'wait', {time: 2});
+                                Actions.channelAdd(channel.id,'moh');
 
                             }).run(incoming);
 
@@ -113,24 +101,63 @@ function processNextAction(action) {
                     console.log('Ring action error', err);
                 }
             );
-            Actions.remove(action._id);
+            //Actions.remove(action._id);
             break;
     }
 
 }
 
+let queues = {};
+
+class Queue {
+    constructor(id) {
+        this.actions = [];
+        this.id = id;
+        this.started = false;
+    }
+
+    add(action) {
+        this.actions.push(action);
+        //console.log('Queue add', this.id, action.type);
+        this.start();
+    }
+
+    start() {
+        if (this.started) {
+            return;
+        }
+        this.started = true;
+
+        console.log('Queue', this.id, 'started');
+
+        let action = false;
+        while (action = _.first(this.actions)) {
+            this.actions = this.actions.slice(1);
+            console.log('doing action', action.type);
+        }
+
+        this.started = false;
+    }
+}
+
 // TODO: kolejka na kolekcjach nie działa!!!
 Actions.find().observe({
     added: function (action) {
-        console.log('action queued', Actions.find({'Channels._id': action.Channels._id}).count());
-        if (!Actions.find({'Channels._id': action.Channels._id, running: true}).count()) {
-            processNextAction(action);
+        if (!queues[action.Channels.id]) {
+            queues[action.Channels.id] = new Queue(action.Channels.id);
         }
-    },
-    removed: function (action) {
-        var action = Actions.findOne();
-        if (action) {
-            processNextAction(action);
-        }
+        queues[action.Channels.id].add(action);
     }
 });
+
+_.extend(Actions,{
+    channelAdd(channelId, type, params) {
+        Actions.insert(_.extend({
+            Channels: {id: channelId},
+            type,
+            sequence: Actions.find({'Channels.id': channelId}).count()
+        },params));
+    }
+});
+
+// https://github.com/CollectionFS/Meteor-power-queue
