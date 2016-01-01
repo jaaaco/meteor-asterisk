@@ -33,14 +33,19 @@ client.connect('http://' + Meteor.settings.ari.host + ':'
 
         ari.on('StasisStart',
             function (event, incoming) {
+                // checking intent
 
-
-
+                // connection from internal
                 if (incoming.dialplan.exten != 'h' && incoming.dialplan.context === 'from-internal' && incoming.state == 'Ring') {
                     console.log('new incoming channel', incoming.dialplan, incoming.id, incoming.state);
 
                     incoming.answer()
                         .then(function () {
+
+                            let outgoing = ari.Channel();
+
+
+
                             incoming.on('StasisEnd', function(event, channel){
                                 if (channel.dialplan.exten != 'h') {
                                     console.log('StasisEnd', channel.dialplan, channel.id);
@@ -49,6 +54,22 @@ client.connect('http://' + Meteor.settings.ari.host + ':'
 
                             ringFor(incoming, 2).then(()=>{
                                 mixingBridge.addChannel({channel: incoming.id});
+
+                                var channel = ari.Channel();
+                                channel.on('StasisStart', function (event, channel) {
+                                    console.log('new outgoing channel', channel.id);
+                                    //mixingBridge.addChannel({channel: channel.id});
+                                });
+                                //channel.on('ChannelDtmfReceived', function (event, channel) {});
+                                channel.originate({endpoint: 'SIP/300', app: 'hello-world', appArgs: 'dialed'})
+                                    .then(function (channel) {
+                                        console.log('outgoing channell created', channel.id);
+                                        //mixingBridge.addChannel({channel: channel.id});
+                                    })
+                                    .catch(function (err) {
+                                        console.log('outgoing channell add to bridge error', err);
+                                    });
+
                             });
 
 
