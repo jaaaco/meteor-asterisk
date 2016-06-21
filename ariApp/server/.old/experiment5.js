@@ -48,29 +48,7 @@ client.connect('http://' + Meteor.settings.ari.host + ':'
                     console.log('new incoming channel', incoming.dialplan, incoming.id, incoming.state);
                     incoming.answer()
                         .then(function () {
-                            console.log('channel answered');
-
-                            Fiber((channel)=>{
-                                let channelId = Channels.insert({
-                                    id: channel.id,
-                                    exten: channel.dialplan.exten
-                                });
-
-                                Actions.channelAdd(channel.id,'ring');
-                                Actions.channelAdd(channel.id,'wait', {time: 2});
-                                Actions.channelAdd(channel.id,'moh');
-
-                            }).run(incoming);
-
-                            incoming.on('ChannelHangupRequest', function(event, channel){
-                                console.log('Channel Hangup', event.cause);
-                            });
-
-                            incoming.on('ChannelDtmfReceived', function (event, channel){
-                                console.log('ChannelDtmfReceived', event.digit, event.duration_ms);
-                            });
-
-
+                            incoming.ring().then();
                         })
                         .catch(function (err) {
                             console.log('ERROR answer', err);

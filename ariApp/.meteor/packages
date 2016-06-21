@@ -6,13 +6,10 @@
 
 meteor-base             # Packages every Meteor app needs to have
 mongo                   # The database Meteor supports right now
-standard-minifiers      # JS/CSS minifiers run for production mode
 es5-shim                # ECMAScript 5 compatibility for older browsers.
 ecmascript              # Enable ECMAScript2015+ syntax in app code
-meteorhacks:npm
 accounts-password
 ejson
 jeeeyul:moment-with-langs@2.6.0
-
-
-npm-container
+standard-minifier-css
+standard-minifier-js
