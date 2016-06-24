@@ -1,0 +1,17 @@
+<template name="node">
+    {{#let node=node}}
+    <div class="node">
+        {{node.type}}
+        <ul class="input">
+            {{#each output in outputs}}
+                <li>{{output.name}}</li>
+            {{/each}}
+        </ul>
+        <ul class="output">
+            {{#each output in outputs}}
+                <li>{{output.name}}</li>
+            {{/each}}
+        </ul>
+    </div>
+    {{/let}}
+</template>

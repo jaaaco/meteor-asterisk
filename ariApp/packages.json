@@ -2,5 +2,6 @@
     "ari-client": "0.6.0",
     "colors": "0.6.2",
     "ws": "0.4.32",
-    "restler": "3.2.2"
+    "restler": "3.2.2",
+    "babel-plugin-transform-class-properties": "6.10.2"
 }

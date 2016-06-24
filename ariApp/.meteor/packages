@@ -13,3 +13,18 @@ ejson
 jeeeyul:moment-with-langs@2.6.0
 standard-minifier-css
 standard-minifier-js
+
+fortawesome:fontawesome
+twbs:bootstrap
+blaze-html-templates
+
+# routing
+kadira:flow-router@2.11.0
+kadira:blaze-layout
+arillo:flow-router-helpers
+zimme:active-route
+
+# standard libraries
+jquery
+underscore
+less

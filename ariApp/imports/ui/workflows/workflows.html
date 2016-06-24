@@ -1,0 +1,9 @@
+<template name="workflows">
+    {{>workflowsAdd}}
+
+    <ul>
+    {{#each workflow in workflows}}
+        <li><a href="{{pathFor 'workflows.show' _id=workflow._id}}">{{workflow.name}}</a></li>
+    {{/each}}
+    </ul>
+</template>

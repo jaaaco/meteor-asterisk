@@ -1,0 +1,13 @@
+<template name="nodesAdd">
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Add node
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            {{#each node in nodes}}
+                <li><a href="#">{{node.label}}</a></li>
+            {{/each}}
+        </ul>
+    </div>
+</template>

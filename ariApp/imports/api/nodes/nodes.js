@@ -1,4 +1,13 @@
-import { Mongo } from 'meteor/mongo';
+import { Mongo } from 'meteor/mongo'
 
-export const Nodes = new Mongo.Collection('Nodes');
-export const Workflows = new Mongo.Collection('Workflows');
+class NodesCollection extends Mongo.Collection {
+
+}
+
+export const Nodes = new NodesCollection('Nodes');
+
+Nodes.allow({
+    insert() { return true; },
+    update() { return true; },
+    remove() { return true; }
+});
