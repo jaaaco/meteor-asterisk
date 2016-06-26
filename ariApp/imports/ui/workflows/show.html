@@ -1,5 +1,9 @@
 <template name="workflowsShow">
     {{#let workflow=workflow}}
+      {{> quickForm id="workflowsEditForm" collection="Workflows" doc=workflow type="update"}}
 
+      <hr>
+
+      {{>nodes workflowId=workflow._id}}
     {{/let}}
 </template>

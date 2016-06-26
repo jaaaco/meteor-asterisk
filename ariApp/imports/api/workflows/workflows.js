@@ -1,5 +1,6 @@
 import { Mongo } from 'meteor/mongo';
 import { Nodes } from '../nodes/nodes.js';
+import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 
 class WorkflowsCollection extends Mongo.Collection {
     remove(selector) {
@@ -17,3 +18,12 @@ Workflows.allow({
     update() { return true; },
     remove() { return true; }
 });
+
+Workflows.schema = new SimpleSchema({
+    name: {
+        type: String,
+        max: 100
+    },
+});
+
+Workflows.attachSchema(Workflows.schema);

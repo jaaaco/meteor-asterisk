@@ -28,3 +28,7 @@ zimme:active-route
 jquery
 underscore
 less
+
+aldeed:autoform
+aldeed:collection2
+aldeed:simple-schema

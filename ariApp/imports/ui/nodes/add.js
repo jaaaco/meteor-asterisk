@@ -9,13 +9,17 @@ import './add.html';
 
 Template.nodesAdd.helpers({
     nodes() {
-        return _.keys(NodeTypes);
+        return _.keys(NodeTypes).sort();
+    },
+    getLabel(node) {
+        const nodeInstance = new NodeTypes[node]();
+        return nodeInstance.label;
     }
 });
 
 Template.nodesAdd.events({
-    'click .js-add' (e) {
+    'click .js-node-add' (e, t) {
         e.preventDefault();
-        Nodes.insert({type: this, 'Workflows._id': this.workflowId});
+        Nodes.insert({type: $(e.currentTarget).data('type'), Workflows: {_id: this.workflowId}});
     }
 });

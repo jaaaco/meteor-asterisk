@@ -6,7 +6,7 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
             {{#each node in nodes}}
-                <li><a href="#">{{node.label}}</a></li>
+                <li><a data-type="{{node}}" class='js-node-add' href="#">{{getLabel node}}</a></li>
             {{/each}}
         </ul>
     </div>

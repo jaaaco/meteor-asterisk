@@ -1,0 +1,11 @@
+<template name="nodes">
+  {{>nodesAdd}}
+
+  <hr>
+
+    <div class="nodes">
+      {{#each nodeItem in nodes}}
+          {{>node node=nodeItem}}
+      {{/each}}
+    </div>
+</template>

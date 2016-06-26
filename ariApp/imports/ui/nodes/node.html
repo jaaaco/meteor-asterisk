@@ -1,17 +1,20 @@
 <template name="node">
-    {{#let node=node}}
-    <div class="node">
-        {{node.type}}
-        <ul class="input">
-            {{#each output in outputs}}
-                <li>{{output.name}}</li>
-            {{/each}}
-        </ul>
-        <ul class="output">
-            {{#each output in outputs}}
-                <li>{{output.name}}</li>
-            {{/each}}
-        </ul>
+
+  <div {{attributes}} class="node panel {{#if moving}} panel-info {{else}} panel-default {{/if}}">
+    <div class="panel-heading js-node-handle">
+      <h3 class="panel-title">{{node.type}}</h3>
     </div>
-    {{/let}}
+    <div class="panel-body">
+      <ul class="input">
+        {{#each output in outputs}}
+          <li>{{output.name}}</li>
+        {{/each}}
+      </ul>
+      <ul class="output">
+        {{#each output in outputs}}
+          <li>{{output.name}}</li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
 </template>

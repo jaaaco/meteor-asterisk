@@ -1,5 +1,9 @@
 import { Nodes } from '../api/nodes/nodes.js';
-import { Workflows } from '../api/nodes/nodes.js';
+import { Workflows } from '../api/workflows/workflows.js';
+
+import '../api/workflows/server/publications.js';
+import '../api/nodes/server/publications.js';
+
 import { Meteor } from 'meteor/meteor';
 import { EJSON } from 'meteor/ejson';
 
