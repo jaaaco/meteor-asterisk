@@ -1,6 +1,6 @@
 import {Base} from './base.js';
 
-export class Answer extends Base {
+export class Hangup extends Base {
   constructor() {
     super();
   }

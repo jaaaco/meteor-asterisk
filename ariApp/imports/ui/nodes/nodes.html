@@ -3,9 +3,21 @@
 
   <hr>
 
-    <div class="nodes">
+    <div id="nodesCanvas" class="nodes">
+
       {{#each nodeItem in nodes}}
-          {{>node node=nodeItem}}
+          {{>node parent=getInstance node=nodeItem moving=(moving nodeItem)}}
       {{/each}}
+
+      <svg width="100%" height="100%">
+        {{#each nodeItem in nodes}}
+          {{#each line in (connectors nodeItem)}}
+            <line x1="{{line.x1}}" y1="{{line.y1}}" x2="{{line.x2}}" y2="{{line.y2}}" style="stroke:rgb(0,0,255);stroke-width:2" />
+          {{/each}}
+        {{/each}}
+        {{#if connector 'drawing'}}
+          <line x1="{{connector 'fromX'}}" y1="{{connector 'fromY'}}" x2="{{connector 'toX'}}" y2="{{connector 'toY'}}" style="stroke:rgb(150,150,0);stroke-width:2" />
+        {{/if}}
+      </svg>
     </div>
 </template>

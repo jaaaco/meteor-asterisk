@@ -1,72 +1,74 @@
 class Participant {
-    constructor(id) {
-        this.id = id;
-    }
+  constructor(id) {
+    this.id = id;
+  }
 
-    // start ringing on participant channel
-    ring(turnOn = true) {
+  // start ringing on participant channel
+  ring(turnOn = true) {
 
-    }
+  }
 
-    // hangup participant's channel
-    hangup() {
+  // hangup participant's channel
+  hangup() {
 
-    }
+  }
 
-    // answer participant's channel
-    answer(cb) {
+  // answer participant's channel
+  answer(cb) {
 
-    }
+  }
 
-    // music on hold
-    moh(turnOn = true) {
+  // music on hold
+  moh(turnOn = true) {
 
-    }
+  }
 
-    // hold channel
-    hold(turnOn = true) {
+  // hold channel
+  hold(turnOn = true) {
 
-    }
+  }
 
-    wait(timeSeconds = 5, done) {
-        _.delay(done,timeSeconds * 1000);
-    }
+  wait(timeSeconds = 5, done) {
+    _.delay(done, timeSeconds * 1000);
+  }
 
 }
 
 class Room {
-    // play sound for all participants
-    play() {
+  // play sound for all participants
+  play() {
 
-    }
+  }
 
-    waitForCommands(cb) {
+  waitForCommands(cb) {
 
-    }
+  }
 
-    // mute all participants
-    muteAll(turnOn = true) {
+  // mute all participants
+  muteAll(turnOn = true) {
 
-    }
+  }
 
-    // play music on hold for all participants
-    mohAll(turnOn = true) {
+  // play music on hold for all participants
+  mohAll(turnOn = true) {
 
-    }
+  }
 
-    addParticipant(Participant) {
+  addParticipant(Participant) {
 
-    }
+  }
 
-    removeParticipant(Participant) {
+  removeParticipant(Participant) {
 
-    }
+  }
 }
 
 
 p = new Participant(id);
 p.ring();
-p.wait(4,() => {p})
+p.wait(4, () => {
+  p
+})
 
 
 

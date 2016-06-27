@@ -1,20 +1,39 @@
 <template name="node">
 
-  <div {{attributes}} class="node panel {{#if moving}} panel-info {{else}} panel-default {{/if}}">
+  <div {{attributes}} data-id="{{node._id}}" class="node panel {{#if moving}} panel-info {{else}} panel-default {{/if}}">
     <div class="panel-heading js-node-handle">
+      <button class="js-node-remove pull-right btn btn-xs btn-default"><i class="fa fa-times"></i> </button>
       <h3 class="panel-title">{{node.type}}</h3>
     </div>
     <div class="panel-body">
-      <ul class="input">
-        {{#each output in outputs}}
-          <li>{{output.name}}</li>
+      {{#each param in params}}
+        <dl>
+          <dt>{{param.label}}</dt>
+          <dd>{{param.value}}</dd>
+        </dl>
+      {{/each}}
+
+      <ul class="node-connector js-node-input list-unstyled pull-left">
+        {{#each inputs}}
+          <li>
+            <svg data-type="{{this.name}}" class="js-connector" style="margin-left: -21px" width="12" height="12">
+              <circle cx="6" cy="6" r="5" stroke="grey" stroke-width="1" fill="{{getConnectorColor this ../node}}" />
+            </svg>
+            {{name}}
+          </li>
         {{/each}}
       </ul>
-      <ul class="output">
-        {{#each output in outputs}}
-          <li>{{output.name}}</li>
+      <ul class="node-connector js-node-output output list-unstyled pull-right">
+        {{#each outputs}}
+          <li class="text-right">{{name}}
+            <svg data-type="{{this.name}}" class="js-connector" style="margin-right: -21px" width="12" height="12">
+              <circle cx="6" cy="6" r="5" stroke="grey" stroke-width="1" fill="{{getConnectorColor this ../node}}" />
+            </svg>
+          </li>
         {{/each}}
       </ul>
     </div>
+
   </div>
+
 </template>

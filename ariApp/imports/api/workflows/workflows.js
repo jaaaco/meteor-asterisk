@@ -4,9 +4,9 @@ import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 
 class WorkflowsCollection extends Mongo.Collection {
     remove(selector) {
-        if (selector._id) {
-            Nodes.remove({'Workflows._id': selector._id});
-        }
+        Workflows.find(selector).forEach(workflow => {
+          Nodes.remove({'Workflows._id': workflow._id});
+        });
         return super.remove(selector);
     }
 }

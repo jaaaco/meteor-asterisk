@@ -9,7 +9,7 @@ Template.workflowsAdd.events({
     'click .js-workflows-add' (e) {
         e.preventDefault();
         FlowRouter.go('workflows.show', {
-            _id: Workflows.insert({ type: this, 'Workflows._id': this.workflowId })
+            _id: Workflows.insert({ name: 'New Workflow' })
         });
     }
 });

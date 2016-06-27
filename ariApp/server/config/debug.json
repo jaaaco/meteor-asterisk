@@ -5,7 +5,7 @@
     "username": "username",
     "password": "password"
   },
-  "debug" : {
+  "debug": {
     "ariClient": true,
     "ariRest": true
   }

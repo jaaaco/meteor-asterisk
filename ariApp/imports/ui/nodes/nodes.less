@@ -3,12 +3,20 @@ div.nodes {
   height: 500px;
   border: 1px solid black;
   position: relative;
+  overflow: scroll;
 
   .node {
+    width: 200px;
     position: absolute;
     left: 0;
     top: 0;
 
-    cursor: move;
+    .panel-heading {
+      cursor: move;
+    }
+
+    .node-connector {
+      cursor: ew-resize;
+    }
   }
 }

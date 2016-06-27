@@ -1,37 +1,52 @@
-
 export class Base {
-    static paramTypes = {
-        uint: {
+  // TODO: move to separate file and import
+  static paramTypes = {
+    uint: {},
+    workflowId: {},
+    string: {}
+  };
 
-        },
-        workflowId: {
+  // TODO: move to separate file and import
+  static connectorTypes = {
+    generic: {},
+    success: {},
+    error: {}
+  };
 
-        },
-        string: {
+  constructor() {
+  }
 
-        }
-    };
+  get label() {
+    return this.type + '.label';
+  }
 
-    constructor() {
-    }
+  get type() {
+    return this.constructor.name;
+  }
 
-    get label() {
-        return this.type + '.label';
-    }
+  get inputs() {
+    return [
+      {
+        name: 'in',
+        type: Base.connectorTypes.generic
+      }
+    ];
+  }
 
-    get type() {
-        return this.constructor.name;
-    }
+  get outputs() {
+    return [
+      {
+        name: 'success',
+        type: Base.connectorTypes.success
+      },
+      {
+        name: 'error',
+        type: Base.connectorTypes.error
+      }
+    ];
+  }
 
-    get inputs() {
-        return ['in'];
-    }
-
-    get outputs() {
-        return ['success', 'error'];
-    }
-
-    get params () {
-        return {};
-    }
+  get params() {
+    return {};
+  }
 }

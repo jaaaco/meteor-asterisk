@@ -1,7 +1,7 @@
-import { Base } from './base.js';
+import {Base} from './base.js';
 
 export class Moh extends Base {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 }
