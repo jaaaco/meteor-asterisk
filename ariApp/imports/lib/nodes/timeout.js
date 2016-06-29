@@ -10,4 +10,10 @@ export class Timeout extends Base {
       }
     });
   }
+
+  job() {
+    setTimeout(() => {
+      this.resolve('success');
+    }, this.node.params.timeout || 1000);
+  }
 }

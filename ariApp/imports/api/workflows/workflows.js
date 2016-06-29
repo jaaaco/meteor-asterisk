@@ -32,6 +32,7 @@ Workflows.schema = new SimpleSchema({
     }
   },
   trigger: {
+    optional: true,
     type: String,
     allowedValues: ['channel','workflow']
   }

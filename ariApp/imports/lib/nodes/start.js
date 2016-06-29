@@ -15,10 +15,8 @@ export class Start extends Base {
     return [];
   }
 
-  run () {
-    return new Promise((resolve, reject) => {
-      console.log('Running node Start');
-      resolve({next: _.keys(this.node.connectors.out)[0]});
-    });
+  job () {
+    console.log('Running node Start');
+    this.resolve('out');
   }
 }

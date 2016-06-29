@@ -44,7 +44,21 @@ export class Base {
 
   run () {
     return new Promise((resolve, reject) => {
-      reject('Run method in class ' + this.constructor.name + ' not implemented');
+      this._resolve = resolve;
+      this._reject = reject;
+      this.job();
     });
+  }
+  
+  job() {
+    this._reject('Run method in class ' + this.constructor.name + ' not implemented');
+  }
+  
+  resolve(output, message) {
+    let next;
+    if (this.node.connectors && this.node.connectors[output]) {
+      next = _.keys(this.node.connectors[output])[0];
+    }
+    this._resolve({next, message});
   }
 }

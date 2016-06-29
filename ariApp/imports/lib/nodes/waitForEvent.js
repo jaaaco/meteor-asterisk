@@ -10,6 +10,9 @@ export class WaitForEvent extends Base {
       },
       timeout: {
         type: paramTypes.uint
+      },
+      param: {
+        type: paramTypes.string
       }
     });
   }

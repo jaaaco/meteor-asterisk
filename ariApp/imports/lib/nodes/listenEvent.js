@@ -24,10 +24,8 @@ export class ListenEvent extends Base {
     ];
   }
 
-  run () {
-    return new Promise((resolve, reject) => {
-      console.log('Running node ListenEvent STUB');
-      resolve({next: _.keys(this.node.connectors.continue)[0]});
-    });
+  job () {
+    console.log('Running node ListenEvent STUB');
+    this.resolve('continue');
   }
 }
