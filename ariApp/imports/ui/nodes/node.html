@@ -7,7 +7,7 @@
     </div>
     <div class="panel-body">
       {{#each param in params}}
-        <dl>
+        <dl class="js-edit-params">
           <dt>{{param.label}}</dt>
           <dd>{{param.value}}</dd>
         </dl>
@@ -35,5 +35,9 @@
     </div>
 
   </div>
+
+  {{#if editingParams}}
+    {{>nodeParams node=node parent=getInstance}}
+  {{/if}}
 
 </template>

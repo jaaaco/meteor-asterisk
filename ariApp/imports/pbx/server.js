@@ -2,6 +2,7 @@ import {default as client} from 'ari-client';
 import {Meteor} from 'meteor/meteor';
 
 import {Nodes} from '../api/nodes/nodes.js';
+import {Nodes as NodeTypes} from '../lib/nodes';
 import {Workflows} from '../api/workflows/workflows.js';
 
 import {default as Fiber} from 'fibers';
@@ -24,11 +25,11 @@ client.connect(
   Meteor.settings.ari.password
 ).then(ari => {
 
-  ari.on('StasisStart', (event, incoming) => {
+  ari.on('StasisStart', (event, channel) => {
     // checking intent
 
 
-    if (incoming.dialplan.exten === 'h') {
+    if (channel.dialplan.exten === 'h') {
       console.log('Channel hangup');
       return;
     }
@@ -52,7 +53,7 @@ client.connect(
       }
 
       if (!workflow) {
-        console.log('No workflow found', incoming);
+        console.log('No workflow found', channel);
         return;
       }
 
@@ -65,99 +66,109 @@ client.connect(
 
 
       // find first node
-      const node = Nodes.findOne({first: true, 'Workflows._id': workflow._id});
+      const node = Nodes.findOne({type: 'Start', 'Workflows._id': workflow._id});
 
-      function runNode(node, next = true) {
+      if (!node) {
+        console.log('No starting node found', {type: 'Start', 'Workflows._id': workflow._id});
+        return;
+      }
+
+      function runNode(nodeId) {
         Fiber(function (params) {
-          let node = params.node;
+          let node = Nodes.findOne(params.nodeId);
           let event = params.event;
-          let incoming = params.incoming;
-
-          if (params.next) {
-            if (!params.node.next) {
-              console.log('last node');
-              return;
-            }
-
-            console.log('Running next node');
-            node = Nodes.findOne(params.node.next);
-          }
+          let channel = params.channel;
 
           console.log('NODE', node);
           console.log('vars', workflowVars);
 
-          switch (node.type) {
-            case 'answer':
-              incoming.answer().then(() => {
-                console.log('Channel answered');
-                return runNode(node);
-              }).catch(err => {
-                console.log('Error answering channel', err);
-              });
-              break;
-            case 'ring':
-              incoming.ring().then(() => {
-                console.log('Channel rang');
-                return runNode(node);
-              }).catch(err => {
-                console.log('Error ringing channel', err);
-              });
-              break;
-            case 'timeout':
-              setTimeout(node => {
-                return runNode(node);
-              }, node.params.time, node);
-              break;
-            case 'hangup':
-              incoming.hangup().then(() => {
-                console.log('Channel hangup !');
-                return runNode(node);
-              }).catch(err => {
-                console.log('Error hangup channel', err);
-              });
-              break;
-            case 'bridge':
-              ari.Bridge().create({type: node.params.type}).then(bridge => {
-                console.log('Bridge created', bridge.id);
-                if (node.params.var) {
-                  workflowVars[node.params.var] = bridge.id;
-                }
-                return runNode(node);
-              }).catch(err => {
-                console.log('Error hangup channel', err);
-              });
-              break;
-            case 'addToBridge':
-              ari.bridges.addChannel({
-                bridgeId: injectParams(node, workflowVars).params.bridge,
-                channel: incoming.id
-              }).then(() => {
-                console.log('addToBridge success!');
-                return runNode(node);
-              }).catch(err => {
-                console.log('addToBridge error', err);
-              });
-              break;
-            case 'originate':
-              var channel = ari.Channel();
-              channel.originate({
-                endpoint: 'SIP/' + node.params.destination,
-                app: 'hello-world',
-                appArgs: new Buffer(EJSON.stringify(injectParams(node.params.appArgs, workflowVars))).toString('base64')
-              })
-                .then(function (channel) {
-                  console.log('outgoing channell created', channel.id);
-                  //mixingBridge.addChannel({channel: channel.id});
-                  return runNode(node);
-                })
-                .catch(function (err) {
-                  console.log('outgoing channell add to bridge error', err);
-                });
-              break;
+          const nodeClass = new NodeTypes[node.type](ari, node, workflowVars, {channel});
 
-          }
+          nodeClass.run().then(result => {
+            console.log('next', result.next, result.message);
 
-        }).run({node, next, event, incoming})
+            if (result.message && result.message.saveVar) {
+              _.extend(workflowVars, result.message.saveVar);
+              console.log('savedWorkflowVar', workflowVars);
+            }
+            runNode(result.next);
+          }).catch(err => {
+            console.log('Node run error', err);
+          });
+
+          
+          // switch (node.type) {
+          //   case 'answer':
+          //     incoming.answer().then(() => {
+          //       console.log('Channel answered');
+          //       return runNode(node);
+          //     }).catch(err => {
+          //       console.log('Error answering channel', err);
+          //     });
+          //     break;
+          //   case 'ring':
+          //     incoming.ring().then(() => {
+          //       console.log('Channel rang');
+          //       return runNode(node);
+          //     }).catch(err => {
+          //       console.log('Error ringing channel', err);
+          //     });
+          //     break;
+          //   case 'timeout':
+          //     setTimeout(node => {
+          //       return runNode(node);
+          //     }, node.params.time, node);
+          //     break;
+          //   case 'hangup':
+          //     incoming.hangup().then(() => {
+          //       console.log('Channel hangup !');
+          //       return runNode(node);
+          //     }).catch(err => {
+          //       console.log('Error hangup channel', err);
+          //     });
+          //     break;
+          //   case 'bridge':
+          //     ari.Bridge().create({type: node.params.type}).then(bridge => {
+          //       console.log('Bridge created', bridge.id);
+          //       if (node.params.var) {
+          //         workflowVars[node.params.var] = bridge.id;
+          //       }
+          //       return runNode(node);
+          //     }).catch(err => {
+          //       console.log('Error hangup channel', err);
+          //     });
+          //     break;
+          //   case 'addToBridge':
+          //     ari.bridges.addChannel({
+          //       bridgeId: injectParams(node, workflowVars).params.bridge,
+          //       channel: incoming.id
+          //     }).then(() => {
+          //       console.log('addToBridge success!');
+          //       return runNode(node);
+          //     }).catch(err => {
+          //       console.log('addToBridge error', err);
+          //     });
+          //     break;
+          //   case 'originate':
+          //     var channel = ari.Channel();
+          //     channel.originate({
+          //       endpoint: (node.params.endpoint || 'SIP') + '/' + node.params.destination,
+          //       app: 'hello-world',
+          //       appArgs: new Buffer(EJSON.stringify(injectParams(node.params.appArgs, workflowVars))).toString('base64')
+          //     })
+          //       .then(function (channel) {
+          //         console.log('outgoing channell created', channel.id);
+          //         //mixingBridge.addChannel({channel: channel.id});
+          //         return runNode(node);
+          //       })
+          //       .catch(function (err) {
+          //         console.log('outgoing channell add to bridge error', err);
+          //       });
+          //     break;
+          //
+          // }
+
+        }).run({nodeId, event, channel})
 
 
       }

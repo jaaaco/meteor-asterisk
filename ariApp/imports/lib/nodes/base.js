@@ -1,19 +1,11 @@
+import { connectorTypes } from './_types.js';
+
 export class Base {
-  // TODO: move to separate file and import
-  static paramTypes = {
-    uint: {},
-    workflowId: {},
-    string: {}
-  };
-
-  // TODO: move to separate file and import
-  static connectorTypes = {
-    generic: {},
-    success: {},
-    error: {}
-  };
-
-  constructor() {
+  constructor(ari, node, vars, options = {}) {
+    this.vars = vars;
+    this.ari = ari;
+    this.node = node;
+    this.channel = options.channel || false;
   }
 
   get label() {
@@ -28,7 +20,7 @@ export class Base {
     return [
       {
         name: 'in',
-        type: Base.connectorTypes.generic
+        type: connectorTypes.generic
       }
     ];
   }
@@ -37,16 +29,22 @@ export class Base {
     return [
       {
         name: 'success',
-        type: Base.connectorTypes.success
+        type: connectorTypes.success
       },
       {
         name: 'error',
-        type: Base.connectorTypes.error
+        type: connectorTypes.error
       }
     ];
   }
 
   get params() {
     return {};
+  }
+
+  run () {
+    return new Promise((resolve, reject) => {
+      reject('Run method in class ' + this.constructor.name + ' not implemented');
+    });
   }
 }

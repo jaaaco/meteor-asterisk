@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { _ } from 'meteor/underscore';
 
@@ -9,7 +8,7 @@ import './add.html';
 
 Template.nodesAdd.helpers({
     nodes() {
-        return _.keys(NodeTypes).sort();
+        return _.without(_.keys(NodeTypes),'Types').sort();
     },
     getLabel(node) {
         const nodeInstance = new NodeTypes[node]();

@@ -20,10 +20,21 @@ Workflows.allow({
 });
 
 Workflows.schema = new SimpleSchema({
-    name: {
-        type: String,
-        max: 100
-    },
+  name: {
+      type: String,
+      max: 100
+  },
+  description: {
+    optional: true,
+    type: String,
+    autoform: {
+      rows: 5
+    }
+  },
+  trigger: {
+    type: String,
+    allowedValues: ['channel','workflow']
+  }
 });
 
 Workflows.attachSchema(Workflows.schema);

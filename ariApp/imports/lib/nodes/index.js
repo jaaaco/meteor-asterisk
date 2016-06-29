@@ -1,3 +1,4 @@
+import { connectorTypes, paramTypes } from './_types.js';
 import {Base} from './base.js';
 import {AddToBridge} from './addToBridge.js';
 import {Answer} from './answer.js';
@@ -12,6 +13,10 @@ import {Record} from './record.js';
 import {Speech} from './speech.js';
 import {Start} from './start.js';
 import {Hangup} from './hangup.js';
+import {Workflow} from './workflow.js';
+import {WaitForEvent} from './waitForEvent.js';
+import {ListenEvent} from './listenEvent.js';
+import {StopRing} from './stopRing.js';
 
 export const Nodes = {
   Base,
@@ -27,5 +32,13 @@ export const Nodes = {
   Record,
   Speech,
   Start,
-  Hangup
+  Hangup,
+  Workflow,
+  WaitForEvent,
+  ListenEvent,
+  StopRing,
+  Types: {
+    connectorTypes,
+    paramTypes
+  }
 };

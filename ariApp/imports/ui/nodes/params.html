@@ -1,0 +1,27 @@
+<template name="nodeParams">
+  <div class="modal show" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="js-close close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Edit node params</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal">
+            {{#each param in params}}
+              <div class="form-group">
+                <label for="" class="col-sm-2 control-label">{{param.name}}</label>
+                <div class="col-sm-10">
+                  <input data-param="{{param.name}}" type="text" class="form-control" value="{{param.value}}">
+                </div>
+              </div>
+            {{/each}}
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default js-close" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</template>

@@ -5,6 +5,7 @@ import { Nodes } from '../../api/nodes/nodes.js';
 import { $ } from 'meteor/jquery';
 import './node.html';
 import './node.less';
+import { ReactiveVar } from 'meteor/reactive-var';
 
 Template.node.events({
   'mousedown .js-connector' (e, t) {
@@ -65,10 +66,20 @@ Template.node.events({
     e.preventDefault();
     e.stopPropagation();
     Nodes.remove(this.node._id);
+  },
+  'click .js-edit-params' (e, t) {
+    e.preventDefault();
+    t.editingParams.set(true);
   }
 });
 
 Template.node.helpers({
+  getInstance() {
+    return Template.instance();
+  },
+  editingParams() {
+    return Template.instance().editingParams.get();
+  },
   attributes() {
     if (this.node.pos) {
       return {
@@ -90,7 +101,7 @@ Template.node.helpers({
     _.each(nodeInstance.params, (param, type) => {
       params.push({
         label: type,
-        value: this.node.params ? this.node.params[type] : '-'
+        value: this.node.params ? this.node.params[type] || '-' : '-'
       })
     });
     return params;
@@ -108,14 +119,18 @@ Template.node.helpers({
     }
 
     switch (connector.type) {
-      case NodeTypes.Base.connectorTypes.generic:
+      case NodeTypes.Types.connectorTypes.generic:
         return 'blue';
-      case NodeTypes.Base.connectorTypes.error:
+      case NodeTypes.Types.connectorTypes.error:
         return 'red';
-      case NodeTypes.Base.connectorTypes.success:
+      case NodeTypes.Types.connectorTypes.success:
         return 'green';
       default:
         return 'black';
     }
   }
+});
+
+Template.node.onCreated(function(){
+  this.editingParams = ReactiveVar(false);
 });

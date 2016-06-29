@@ -1,7 +1,12 @@
 import {Base} from './base.js';
+import { paramTypes } from './_types.js';
 
 export class Playback extends Base {
-  constructor() {
-    super();
+  get params() {
+    return _.extend(super.params, {
+      file: {
+        type: paramTypes.string
+      }
+    });
   }
 }
