@@ -2,10 +2,11 @@ FROM debian:jessie
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install wget libjansson-dev aptitude git build-essential libspeex-dev libspeexdsp-dev libgsm1-dev openssl uuid libjansson4 ncurses-dev libxml2-dev uuid-dev libsqlite3-dev doxygen subversion -y
-RUN cd /root && wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
-RUN cd /root && tar zxfv asterisk-13-current.tar.gz
+RUN cd /root && wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13.9.1.tar.gz
+RUN cd /root && tar zxfv asterisk-13.9.1.tar.gz
 RUN cd /root/asterisk-13.9.1/ && ./configure
-RUN cd /root/asterisk-13.9.1/ && make menuselect
+COPY menuselect.makeopts /root/asterisk-13.9.1/menuselect.makeopts
+RUN cd /root/asterisk-13.9.1/ && make menuselect.makeopts
 RUN cd /root/asterisk-13.9.1/ && make
 RUN cd /root/asterisk-13.9.1/ && make install
 COPY config/ /etc/asterisk/

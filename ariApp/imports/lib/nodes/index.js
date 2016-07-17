@@ -9,7 +9,7 @@ import { Timeout } from './timeout.js';
 import { Moh, StopMoh } from './moh.js';
 import { Playback } from './playback.js';
 import { TimeCondition } from './timeCondition.js';
-import { Record } from './record.js';
+import { Record, RecordStop } from './record.js';
 import { Speech } from './speech.js';
 import { Start } from './start.js';
 import { Hangup } from './hangup.js';
@@ -20,7 +20,10 @@ import { StopRing} from './stopRing.js';
 import { DtmfMenu } from './dtmfMenu.js';
 import { WaitForDtmf} from './waitForDtmf.js';
 
+import { Crm } from './crm';
+
 export const Nodes = {
+  CrmGetCallerId: Crm.GetCallerId,
   Base,
   AddToBridge,
   Answer,
@@ -33,6 +36,7 @@ export const Nodes = {
   Playback,
   TimeCondition,
   Record,
+  RecordStop,
   Speech,
   Start,
   Hangup,

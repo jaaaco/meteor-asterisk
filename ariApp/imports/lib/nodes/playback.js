@@ -26,7 +26,6 @@ export class Playback extends Base {
       }
     ];
   }
-
   job() {
     const playback = this.ari.Playback();
 
@@ -36,7 +35,7 @@ export class Playback extends Base {
       }
     });
 
-    this.channel.play({media: this.node.params.media}, playback).then(()=>{
+    this.channel.play({format: 'ogg', media: this.node.params.media}, playback).then(()=>{
       if (this.node.connectors && this.node.connectors.played) {
         this.resolve('played');
       }
